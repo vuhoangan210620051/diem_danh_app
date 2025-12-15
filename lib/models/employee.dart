@@ -170,8 +170,18 @@ class Employee {
       return AttendanceStatus.absent;
     }
 
-    // 3. ĐÃ CHECK-IN
-    if (lastCheckInDate == todayStr) {
+    // 3. ĐÃ CHECK-IN (kiểm tra trong checkInHistory thay vì lastCheckInDate)
+    final hasCheckInToday = checkInHistory.any((record) {
+      final recordDate = DateTime(
+        record.timestamp.year,
+        record.timestamp.month,
+        record.timestamp.day,
+      );
+      final currentDate = DateTime(now.year, now.month, now.day);
+      return recordDate.isAtSameMomentAs(currentDate);
+    });
+
+    if (hasCheckInToday) {
       final isLateToday = lateHistory.any((l) {
         final d = l.timestamp;
         return d.year == now.year && d.month == now.month && d.day == now.day;
