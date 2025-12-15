@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "882436085966",
+    "project_id": "diemdanh-70701",
+    "storage_bucket": "diemdanh-70701.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882436085966:android:9cc307247a8afe8daa589f",
+        "android_client_info": {
+          "package_name": "com.example.diem_danh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDUqwP1isLE4SdrP70XhmI6D8H4g1Wu9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882436085966:android:e49134f66d7b3fe0aa589f",
+        "android_client_info": {
+          "package_name": "com.example.diemdanh_sv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDUqwP1isLE4SdrP70XhmI6D8H4g1Wu9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882436085966:android:e5d38522ae4b6de3aa589f",
+        "android_client_info": {
+          "package_name": "com.example.testapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDUqwP1isLE4SdrP70XhmI6D8H4g1Wu9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

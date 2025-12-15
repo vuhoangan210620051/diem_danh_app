@@ -1,0 +1,32 @@
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Employees collection: allow reads/writes to authenticated users
+    // (including anonymous sign-in). Admin can manage via local login.
+    match /employees/{docId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Config collection - work_time document
+    match /config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Work-time settings (read for authenticated users, write by admins)
+    match /work_time_settings/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.token.admin == true;
+    }
+
+    // Custom notifications collection
+    match /custom_notifications/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+
+    // Default deny for anything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
