@@ -60,7 +60,9 @@ class _QRScanPageState extends State<QRScanPage> {
 
   Widget _buildScanOverlay(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final scanArea = size.width * 0.7; // Kích thước khung vuông
+    final scanArea = size.width > 600
+        ? 400.0 // Desktop/Web: cố định 400px
+        : size.width * 0.7; // Mobile: 70% màn hình
 
     return Stack(
       children: [

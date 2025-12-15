@@ -6,7 +6,6 @@ import '../../models/employee.dart';
 import '../../repositories/employee_repository.dart';
 import '../../widgets/scan/QR_Scan/qr_scan_page.dart';
 import '../../services/attendance_service.dart';
-import 'package:flutter/foundation.dart';
 
 class ScanTab extends StatefulWidget {
   final EmployeeRepository repo;
@@ -99,11 +98,6 @@ class _ScanTabState extends State<ScanTab> {
                 children: [
                   ScanLogo(
                     onTap: () async {
-                      if (kIsWeb) {
-                        // WEB: không mở camera
-                        _showDesktopHint(context);
-                        return;
-                      }
                       final result = await Navigator.push<String>(
                         context,
                         MaterialPageRoute(builder: (_) => const QRScanPage()),
