@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../config/work_time_config.dart';
 import '../../models/work_time_setting.dart';
 import '../../repositories/firebase_work_time_repository.dart';
+import '../../repositories/app_repositories.dart';
+import '../../models/late_record.dart';
+import '../../models/absent_record.dart';
 
 class WorkTimeSettingCard extends StatefulWidget {
   const WorkTimeSettingCard({super.key});
@@ -65,7 +68,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
-            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -162,10 +165,86 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
     // 2️⃣ ÁP DỤNG NGAY CHO THIẾT BỊ NÀY
     WorkTimeConfig.applyFromSetting(setting);
 
+    // 3️⃣ TÍNH LẠI TẤT CẢ ĐIỂM DANH TRONG NGÀY
+    await _recalculateTodayAttendance();
+
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text("Đã lưu giờ làm việc")));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Đã lưu giờ làm việc và cập nhật điểm danh"),
+      ),
+    );
+  }
+
+  /// TÍNH LẠI ĐIỂM DANH HÔM NAY
+  Future<void> _recalculateTodayAttendance() async {
+    final employeeRepo = AppRepositories.employeeRepo;
+    final employees = await employeeRepo.getEmployees();
+    final now = DateTime.now();
+    final today =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    for (final emp in employees) {
+      // Chỉ xử lý nhân viên đã check-in hôm nay
+      if (emp.lastCheckInDate != today) continue;
+
+      // Tìm check-in hôm nay
+      final todayCheckIns = emp.checkInHistory.where((record) {
+        final recordDate = DateTime(
+          record.timestamp.year,
+          record.timestamp.month,
+          record.timestamp.day,
+        );
+        final currentDate = DateTime(now.year, now.month, now.day);
+        return recordDate.isAtSameMomentAs(currentDate);
+      }).toList();
+
+      if (todayCheckIns.isEmpty) continue;
+
+      final checkInTime = todayCheckIns.first.timestamp;
+      final startTime = WorkTimeConfig.startTime(checkInTime);
+      final lateLimit = WorkTimeConfig.lateLimit(checkInTime);
+
+      // Tính lại trạng thái
+      List<LateRecord> newLateHistory = emp.lateHistory.where((late) {
+        final lateDate = DateTime(
+          late.timestamp.year,
+          late.timestamp.month,
+          late.timestamp.day,
+        );
+        final currentDate = DateTime(now.year, now.month, now.day);
+        return !lateDate.isAtSameMomentAs(
+          currentDate,
+        ); // Giữ lại late của các ngày khác
+      }).toList();
+
+      List<AbsentRecord> newAbsentHistory = emp.absentHistory.where((absent) {
+        return absent.date != today; // Giữ lại absent của các ngày khác
+      }).toList();
+
+      // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
+      if (checkInTime.isAfter(lateLimit)) {
+        // Quá 15p → vắng
+        newAbsentHistory.add(AbsentRecord(date: today));
+      } else if (checkInTime.isAfter(startTime)) {
+        // Đi muộn
+        final minutesLate = checkInTime.difference(startTime).inMinutes;
+        if (minutesLate > 0) {
+          newLateHistory.add(
+            LateRecord(timestamp: checkInTime, minutesLate: minutesLate),
+          );
+        }
+      }
+      // Nếu đúng giờ: không thêm gì cả
+
+      // Cập nhật employee
+      final updatedEmp = emp.copyWith(
+        lateHistory: newLateHistory,
+        absentHistory: newAbsentHistory,
+      );
+
+      await employeeRepo.updateEmployee(updatedEmp);
+    }
   }
 }
 
