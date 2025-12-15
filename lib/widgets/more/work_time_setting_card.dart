@@ -289,9 +289,20 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         return !recordDate.isAtSameMomentAs(currentDate);
       }).toList();
 
+      final newCheckOutHistory = emp.checkOutHistory.where((record) {
+        final recordDate = DateTime(
+          record.timestamp.year,
+          record.timestamp.month,
+          record.timestamp.day,
+        );
+        final currentDate = DateTime(now.year, now.month, now.day);
+        return !recordDate.isAtSameMomentAs(currentDate);
+      }).toList();
+
       // Cập nhật employee - reset hoàn toàn
       final updatedEmp = emp.copyWith(
         checkInHistory: newCheckInHistory,
+        checkOutHistory: newCheckOutHistory,
         lateHistory: newLateHistory,
         absentHistory: newAbsentHistory,
         lastCheckInDate: null, // Reset để cho phép check-in lại

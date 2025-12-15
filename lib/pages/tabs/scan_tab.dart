@@ -169,16 +169,7 @@ class _ScanTabState extends State<ScanTab> {
 
                           switch (checkOutResult) {
                             case CheckOutResult.success:
-                              _snack(
-                                context,
-                                "✅ Check-out thành công! Đủ giờ làm",
-                              );
-                              break;
-                            case CheckOutResult.insufficientHours:
-                              _snack(
-                                context,
-                                "⚠️ Check-out thành công! Chưa đủ 8 giờ - Sẽ tính vắng",
-                              );
+                              _snack(context, "✅ Check-out thành công!");
                               break;
                             case CheckOutResult.notCheckedIn:
                               _snack(context, "❌ Chưa check-in hôm nay");
@@ -421,13 +412,7 @@ class _ScanTabState extends State<ScanTab> {
 
     switch (result) {
       case CheckOutResult.success:
-        _snack(context, "Check-out thành công! Đủ giờ làm");
-        break;
-      case CheckOutResult.insufficientHours:
-        _snack(
-          context,
-          "Check-out thành công! Chưa đủ 8 giờ làm - Sẽ tính vắng",
-        );
+        _snack(context, "Check-out thành công!");
         break;
       case CheckOutResult.notCheckedIn:
         _snack(context, "Chưa check-in hôm nay");

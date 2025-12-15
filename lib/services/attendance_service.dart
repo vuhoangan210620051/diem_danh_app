@@ -120,8 +120,18 @@ class AttendanceService {
     final checkInTime = todayCheckIn.first.timestamp;
     final workDuration = now.difference(checkInTime);
 
-    // Kiểm tra có đủ giờ làm không
+    // Kiểm tra thời gian hiện tại có >= thời gian ra về không
+    final endWorkTime = WorkTimeConfig.endTime(now);
+    final isAfterEndTime =
+        now.isAfter(endWorkTime) || now.isAtSameMomentAs(endWorkTime);
+
+    // Kiểm tra có đủ giờ làm không (8 giờ)
     final hasEnoughHours = workDuration.inHours >= WorkTimeConfig.minWorkHours;
+
+    // Xác định có cần tính vắng không:
+    // - Nếu checkout trước giờ ra về → tính vắng
+    // - Nếu checkout sau giờ ra về nhưng chưa đủ 8 giờ → tính vắng
+    final shouldMarkAbsent = !isAfterEndTime || !hasEnoughHours;
 
     // Thêm check-out vào lịch sử
     final updated = emp.copyWith(
@@ -129,19 +139,16 @@ class AttendanceService {
         ...emp.checkOutHistory,
         CheckRecord(timestamp: now, type: 'out'),
       ],
-      // Nếu chưa đủ giờ làm, thêm vào lịch sử vắng
-      absentHistory: hasEnoughHours
-          ? emp.absentHistory
-          : [...emp.absentHistory, AbsentRecord(date: today)],
+      // Tính vắng nếu checkout trước giờ ra về hoặc chưa đủ giờ làm
+      absentHistory: shouldMarkAbsent
+          ? [...emp.absentHistory, AbsentRecord(date: today)]
+          : emp.absentHistory,
     );
 
     await repo.updateEmployee(updated);
 
-    if (hasEnoughHours) {
-      return CheckOutResult.success;
-    } else {
-      return CheckOutResult.insufficientHours;
-    }
+    // Luôn cho phép checkout và trả về success
+    return CheckOutResult.success;
   }
 
   static Future<void> autoMarkAbsent(EmployeeRepository repo) async {
@@ -186,9 +193,4 @@ enum AttendanceResult {
   onLeave,
 }
 
-enum CheckOutResult {
-  success,
-  insufficientHours,
-  notCheckedIn,
-  alreadyCheckedOut,
-}
+enum CheckOutResult { success, notCheckedIn, alreadyCheckedOut }
