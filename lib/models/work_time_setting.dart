@@ -4,6 +4,7 @@ class WorkTimeSetting {
   final int endHour;
   final int endMinute;
   final int allowLateMinutes;
+  final int maxLeaveDays;
 
   WorkTimeSetting({
     required this.startHour,
@@ -11,6 +12,7 @@ class WorkTimeSetting {
     required this.endHour,
     required this.endMinute,
     required this.allowLateMinutes,
+    this.maxLeaveDays = 12,
   });
 
   Map<String, dynamic> toJson() => {
@@ -19,6 +21,7 @@ class WorkTimeSetting {
     "endHour": endHour,
     "endMinute": endMinute,
     "allowLateMinutes": allowLateMinutes,
+    "maxLeaveDays": maxLeaveDays,
   };
 
   factory WorkTimeSetting.fromJson(Map<String, dynamic> json) {
@@ -28,6 +31,7 @@ class WorkTimeSetting {
       endHour: json["endHour"],
       endMinute: json["endMinute"],
       allowLateMinutes: json["allowLateMinutes"],
+      maxLeaveDays: json["maxLeaveDays"] ?? 12,
     );
   }
 }

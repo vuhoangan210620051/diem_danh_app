@@ -18,6 +18,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
   late TimeOfDay start;
   late TimeOfDay end;
   late TimeOfDay lateTime;
+  late int maxLeaveDays;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         WorkTimeConfig.startHour * 60 + WorkTimeConfig.startMinute;
     final lateTotal = startTotal + WorkTimeConfig.allowLateMinutes;
     lateTime = TimeOfDay(hour: lateTotal ~/ 60, minute: lateTotal % 60);
+    maxLeaveDays = WorkTimeConfig.maxLeaveDays;
   }
 
   Future<void> _pickTime(
@@ -119,6 +121,60 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
                 helper: "Sau giờ này sẽ tính là đi muộn",
                 onTap: () => _pickTime(lateTime, (v) => lateTime = v),
               ),
+              const SizedBox(height: 16),
+
+              /// SỐ NGÀY NGHỈ PHÉP NĂM
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Số ngày nghỉ phép năm",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F7F8),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "$maxLeaveDays ngày",
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed: maxLeaveDays > 0
+                                  ? () => setState(() => maxLeaveDays--)
+                                  : null,
+                              color: const Color(0xFF2A3950),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: () => setState(() => maxLeaveDays++),
+                              color: const Color(0xFF2A3950),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Số ngày nghỉ phép tối đa mỗi nhân viên được sử dụng trong năm",
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -158,6 +214,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
       allowLateMinutes:
           (lateTime.hour * 60 + lateTime.minute) -
           (start.hour * 60 + start.minute),
+      maxLeaveDays: maxLeaveDays,
     );
 
     // 1️⃣ LƯU FIREBASE (đồng bộ tất cả thiết bị)

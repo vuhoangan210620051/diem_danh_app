@@ -8,7 +8,7 @@ class WorkTimeConfig {
   static int endMinute = 0;
 
   static int allowLateMinutes = 15;
-  static const int maxLeaveDays = 12;
+  static int maxLeaveDays = 12;
   static int minWorkHours = 8; // Số giờ làm việc tối thiểu
 
   static void applyFromSetting(WorkTimeSetting s) {
@@ -17,6 +17,7 @@ class WorkTimeConfig {
     endHour = s.endHour;
     endMinute = s.endMinute;
     allowLateMinutes = s.allowLateMinutes;
+    maxLeaveDays = s.maxLeaveDays;
   }
 
   static DateTime startTime(DateTime day) =>
