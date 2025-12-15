@@ -261,8 +261,11 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
       final startTime = WorkTimeConfig.startTime(checkInTime);
       final lateLimit = WorkTimeConfig.lateLimit(checkInTime);
 
-      // Xóa tất cả late và absent của hôm nay trước
-      List<LateRecord> newLateHistory = emp.lateHistory.where((late) {
+      // LUÔN RESET HOÀN TOÀN về "chưa điểm danh"
+      // Xóa tất cả late, absent, checkInHistory của hôm nay
+      // Đặt lastCheckInDate = null để cho phép check-in lại
+
+      final newLateHistory = emp.lateHistory.where((late) {
         final lateDate = DateTime(
           late.timestamp.year,
           late.timestamp.month,
@@ -272,48 +275,26 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         return !lateDate.isAtSameMomentAs(currentDate);
       }).toList();
 
-      List<AbsentRecord> newAbsentHistory = emp.absentHistory.where((absent) {
+      final newAbsentHistory = emp.absentHistory.where((absent) {
         return absent.date != today;
       }).toList();
 
-      // Reset lastCheckInDate để cho phép check-in lại
-      String? newLastCheckInDate;
-      List<CheckRecord> newCheckInHistory = emp.checkInHistory;
+      final newCheckInHistory = emp.checkInHistory.where((record) {
+        final recordDate = DateTime(
+          record.timestamp.year,
+          record.timestamp.month,
+          record.timestamp.day,
+        );
+        final currentDate = DateTime(now.year, now.month, now.day);
+        return !recordDate.isAtSameMomentAs(currentDate);
+      }).toList();
 
-      // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
-      if (checkInTime.isAfter(lateLimit)) {
-        // Quá 15p → Reset về trạng thái "chưa điểm danh"
-        // Xóa checkInHistory và KHÔNG thêm late hay absent
-        newLastCheckInDate = null;
-        newCheckInHistory = emp.checkInHistory.where((record) {
-          final recordDate = DateTime(
-            record.timestamp.year,
-            record.timestamp.month,
-            record.timestamp.day,
-          );
-          final currentDate = DateTime(now.year, now.month, now.day);
-          return !recordDate.isAtSameMomentAs(currentDate);
-        }).toList();
-      } else if (checkInTime.isAfter(startTime)) {
-        // Đi muộn - thêm vào newLateHistory (giữ lastCheckInDate và checkInHistory)
-        final minutesLate = checkInTime.difference(startTime).inMinutes;
-        if (minutesLate > 0) {
-          newLateHistory.add(
-            LateRecord(timestamp: checkInTime, minutesLate: minutesLate),
-          );
-        }
-        newLastCheckInDate = today;
-      } else {
-        // Đúng giờ (giữ lastCheckInDate và checkInHistory, không thêm late)
-        newLastCheckInDate = today;
-      }
-
-      // Cập nhật employee
+      // Cập nhật employee - reset hoàn toàn
       final updatedEmp = emp.copyWith(
         checkInHistory: newCheckInHistory,
         lateHistory: newLateHistory,
         absentHistory: newAbsentHistory,
-        lastCheckInDate: newLastCheckInDate,
+        lastCheckInDate: null, // Reset để cho phép check-in lại
       );
 
       await employeeRepo.updateEmployee(updatedEmp);

@@ -41,47 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyATVTIVDcYGN1wEra3FmkDWKI_2cLYF_aQ',
-    appId: '1:882436085966:web:815eb7b12cca3c3daa589f',
-    messagingSenderId: '882436085966',
-    projectId: 'diemdanh-70701',
-    authDomain: 'diemdanh-70701.firebaseapp.com',
-    storageBucket: 'diemdanh-70701.firebasestorage.app',
+    apiKey: 'AIzaSyApOdYcytY02RyxHFrTX2Y1hqEDEmRFml4',
+    appId: '1:426208737194:web:c49201f900254925981dd3',
+    messagingSenderId: '426208737194',
+    projectId: 'diemdanh-ff855',
+    authDomain: 'diemdanh-ff855.firebaseapp.com',
+    storageBucket: 'diemdanh-ff855.firebasestorage.app',
+    measurementId: 'G-WVRECQLSVQ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCDUqwP1isLE4SdrP70XhmI6D8H4g1Wu9o',
-    appId: '1:882436085966:android:9cc307247a8afe8daa589f',
-    messagingSenderId: '882436085966',
-    projectId: 'diemdanh-70701',
-    storageBucket: 'diemdanh-70701.firebasestorage.app',
+    apiKey: 'AIzaSyD7jfChHTM2gUatPSCmoCHwUs2eMXSONiI',
+    appId: '1:426208737194:android:a05f4fb63083c7ed981dd3',
+    messagingSenderId: '426208737194',
+    projectId: 'diemdanh-ff855',
+    storageBucket: 'diemdanh-ff855.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBG-leSy1LNGChAHC90NbMdQ6UE01iEX3Q',
-    appId: '1:882436085966:ios:8f1411d1aaa93f2daa589f',
-    messagingSenderId: '882436085966',
-    projectId: 'diemdanh-70701',
-    storageBucket: 'diemdanh-70701.firebasestorage.app',
+    apiKey: 'AIzaSyDBZvLbmPEpTGGbk7m_kF2xYRebvoPVMu8',
+    appId: '1:426208737194:ios:07dd6bb167157cf9981dd3',
+    messagingSenderId: '426208737194',
+    projectId: 'diemdanh-ff855',
+    storageBucket: 'diemdanh-ff855.firebasestorage.app',
     iosBundleId: 'com.example.diemDanh',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBG-leSy1LNGChAHC90NbMdQ6UE01iEX3Q',
-    appId: '1:882436085966:ios:8f1411d1aaa93f2daa589f',
-    messagingSenderId: '882436085966',
-    projectId: 'diemdanh-70701',
-    storageBucket: 'diemdanh-70701.firebasestorage.app',
+    apiKey: 'AIzaSyDBZvLbmPEpTGGbk7m_kF2xYRebvoPVMu8',
+    appId: '1:426208737194:ios:07dd6bb167157cf9981dd3',
+    messagingSenderId: '426208737194',
+    projectId: 'diemdanh-ff855',
+    storageBucket: 'diemdanh-ff855.firebasestorage.app',
     iosBundleId: 'com.example.diemDanh',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyATVTIVDcYGN1wEra3FmkDWKI_2cLYF_aQ',
-    appId: '1:882436085966:web:c95e5c5032d0fc84aa589f',
-    messagingSenderId: '882436085966',
-    projectId: 'diemdanh-70701',
-    authDomain: 'diemdanh-70701.firebaseapp.com',
-    storageBucket: 'diemdanh-70701.firebasestorage.app',
+    apiKey: 'AIzaSyApOdYcytY02RyxHFrTX2Y1hqEDEmRFml4',
+    appId: '1:426208737194:web:c95101756e9b8730981dd3',
+    messagingSenderId: '426208737194',
+    projectId: 'diemdanh-ff855',
+    authDomain: 'diemdanh-ff855.firebaseapp.com',
+    storageBucket: 'diemdanh-ff855.firebasestorage.app',
+    measurementId: 'G-G7CDZLJNJG',
   );
 
 }

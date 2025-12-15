@@ -15,6 +15,8 @@
 //   runApp(const AttendanceApp());
 // }
 
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -24,13 +26,19 @@ import 'auth/login_page.dart';
 import 'config/work_time_config.dart';
 import 'models/work_time_setting.dart';
 import 'repositories/firebase_work_time_repository.dart';
+import 'services/local_notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // 🔑 ĐẢM BẢO AUTH TRƯỚC KHI ĐỤNG FIRESTORE
+  // Khởi tạo local notifications cho Android
+  if (!kIsWeb && Platform.isAndroid) {
+    await LocalNotificationService.initialize();
+  }
+
+  //  ĐẢM BẢO AUTH TRƯỚC KHI ĐỤNG FIRESTORE
   if (FirebaseAuth.instance.currentUser == null) {
     await FirebaseAuth.instance.signInAnonymously();
   }

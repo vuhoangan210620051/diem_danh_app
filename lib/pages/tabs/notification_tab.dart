@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../../models/employee.dart';
 import '../../models/leave_record.dart';
@@ -6,6 +8,8 @@ import '../../models/custom_notification.dart';
 import '../../repositories/employee_repository.dart';
 import '../../services/notification_state_service.dart';
 import '../../services/custom_notification_service.dart';
+import '../../services/browser_notification.dart';
+import '../../services/local_notification_service.dart';
 import 'package:intl/intl.dart';
 
 enum NotificationFilter { all, unread }
@@ -68,9 +72,30 @@ class _NotificationTabState extends State<NotificationTab>
     super.initState();
     _loadReadState();
     // Lắng nghe custom notifications từ Firestore
-    _customNotifSub = CustomNotificationService.streamNotifications().listen(
-      (_) => _loadReadState(),
-    );
+    _customNotifSub = CustomNotificationService.streamNotifications().listen((
+      notifications,
+    ) {
+      // 🔔 Hiển thị notification cho thông báo mới (admin)
+      // Chỉ hiển thị thông báo "Yêu cầu nghỉ phép mới" (từ nhân viên gửi lên)
+      if (notifications.isNotEmpty) {
+        final latest = notifications.first;
+        // Chỉ hiển thị nếu là yêu cầu nghỉ phép (không hiển thị khi admin tự duyệt)
+        if (latest.title.contains('Yêu cầu nghỉ phép mới')) {
+          if (kIsWeb) {
+            BrowserNotificationService.show(
+              title: latest.title,
+              body: latest.message,
+            );
+          } else if (Platform.isAndroid) {
+            LocalNotificationService.show(
+              title: latest.title,
+              body: latest.message,
+            );
+          }
+        }
+      }
+      _loadReadState();
+    });
     // Set callback để parent có thể trigger refresh
     widget.onRefreshCallbackSet?.call(_loadReadState);
   }

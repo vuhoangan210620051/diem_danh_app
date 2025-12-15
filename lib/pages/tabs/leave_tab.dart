@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../models/leave_record.dart';
 import '../../models/custom_notification.dart';
 import '../../services/custom_notification_service.dart';
+import '../../services/browser_notification.dart';
 import '../../widgets/employee/leave_form/admin/admin_leave_header.dart';
 import '../../widgets/employee/leave_form/admin/admin_leave_card.dart';
 import '../../models/employee.dart';
@@ -74,6 +75,8 @@ class _LeaveTabState extends State<LeaveTab> {
         senderName: 'Quản trị viên',
       );
       await CustomNotificationService.addNotification(notification);
+
+      // 🔔 Hiển thị browser notification cho nhân viên
     }
 
     setState(() {

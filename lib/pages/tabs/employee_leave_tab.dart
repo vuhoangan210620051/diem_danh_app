@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../models/employee.dart';
 import '../../models/leave_record.dart';
+import '../../models/custom_notification.dart';
 import '../../repositories/employee_repository.dart';
+import '../../services/browser_notification.dart';
+import '../../services/custom_notification_service.dart';
 import '../../widgets/employee/leave_form/leave_card.dart';
 import '../../widgets/employee/leave_form/leave_header.dart';
 import '../../widgets/employee/leave_form/create_leave_dialog.dart';
@@ -82,6 +86,17 @@ class _EmployeeLeaveTabState extends State<EmployeeLeaveTab> {
 
       await widget.repo.updateEmployee(updated); // ✅ cập nhật DB
 
+      // 🔔 Tạo thông báo cho admin
+      await CustomNotificationService.addNotification(
+        CustomNotification(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          title: 'Yêu cầu nghỉ phép mới',
+          message: '${_employee.name} đã gửi đơn xin nghỉ ${record.type}',
+          timestamp: DateTime.now(),
+          target: NotificationTarget.all,
+        ),
+      );
+
       setState(() {
         _employee = updated; // ✅ replace object
       });
@@ -118,7 +133,7 @@ class _EmployeeLeaveTabState extends State<EmployeeLeaveTab> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(18),
-                    ),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

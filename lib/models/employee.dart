@@ -15,6 +15,7 @@ class Employee {
   final String password;
   final String? avatarPath;
   final String? gender; // "Nam", "Nữ", "Khác"
+  final String? fcmToken; // FCM token for push notifications
   final String? lastCheckInDate;
   final List<LateRecord> lateHistory;
   final List<AbsentRecord> absentHistory;
@@ -30,6 +31,7 @@ class Employee {
     required this.password,
     this.avatarPath,
     this.gender,
+    this.fcmToken,
     this.lateHistory = const [],
     this.leaveHistory = const [],
     this.absentHistory = const [],
@@ -45,6 +47,7 @@ class Employee {
     String? password,
     String? avatarPath,
     String? gender,
+    String? fcmToken,
     List<LateRecord>? lateHistory,
     List<LeaveRecord>? leaveHistory,
     List<AbsentRecord>? absentHistory,
@@ -60,6 +63,7 @@ class Employee {
       password: password ?? this.password,
       avatarPath: avatarPath ?? this.avatarPath,
       gender: gender ?? this.gender,
+      fcmToken: fcmToken ?? this.fcmToken,
       lateHistory: lateHistory ?? this.lateHistory,
       leaveHistory: leaveHistory ?? this.leaveHistory,
       absentHistory: absentHistory ?? this.absentHistory,
@@ -82,6 +86,7 @@ class Employee {
     "checkOutHistory": checkOutHistory.map((e) => e.toJson()).toList(),
     "avatarPath": avatarPath,
     "gender": gender,
+    "fcmToken": fcmToken,
     "lateHistory": lateHistory.map((e) => e.toJson()).toList(),
     "absentHistory": absentHistory.map((e) => e.toJson()).toList(),
     "leaveHistory": leaveHistory.map((e) => e.toJson()).toList(),
@@ -109,6 +114,7 @@ class Employee {
       password: json["password"],
       avatarPath: json["avatarPath"],
       gender: json["gender"],
+      fcmToken: json["fcmToken"],
       lateHistory: (json["lateHistory"] as List<dynamic>? ?? [])
           .map((e) => LateRecord.fromJson(e))
           .toList(),

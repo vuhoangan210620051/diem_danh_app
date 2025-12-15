@@ -9,6 +9,7 @@ import '../pages/employee_home_page.dart';
 import '../services/auth_service.dart';
 import '../repositories/local_admin_repository.dart';
 import '../services/employee_auth_service.dart';
+import '../services/browser_notification.dart';
 import '../repositories/app_repositories.dart';
 
 enum LoginType { admin, employee }
@@ -78,6 +79,9 @@ class _LoginPageState extends State<LoginPage> {
       }
       final emp = await empAuth.login(savedEmail!, savedPassword!);
       if (emp != null && mounted) {
+        // 🔔 Xin quyền browser notification
+        await BrowserNotificationService.requestPermission();
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -345,6 +349,9 @@ class _LoginPageState extends State<LoginPage> {
                                   password,
                                 );
                                 if (emp != null && mounted) {
+                                  // 🔔 Xin quyền browser notification
+                                  await BrowserNotificationService.requestPermission();
+
                                   Navigator.pushReplacement(
                                     ctx,
                                     MaterialPageRoute(

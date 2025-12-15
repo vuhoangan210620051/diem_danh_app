@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'tabs/employee_scan_tab.dart';
 import 'tabs/employee_more_tab.dart';
@@ -9,6 +11,8 @@ import '../models/leave_record.dart';
 import '../repositories/employee_repository.dart';
 import '../services/custom_notification_service.dart';
 import '../services/notification_state_service.dart';
+import '../services/browser_notification.dart';
+import '../services/local_notification_service.dart';
 import 'tabs/employee_leave_tab.dart';
 import 'tabs/employee_notification_tab.dart';
 
@@ -50,10 +54,28 @@ class _EmployeeHomePageState extends State<EmployeeHomePage> {
 
   void _startListening() {
     // Lắng nghe custom notifications
-    _notificationSub = CustomNotificationService.streamNotificationsForEmployee(
-      _currentEmployee.id,
-      _currentEmployee.dept,
-    ).listen((_) => _updateBadgeCount());
+    _notificationSub =
+        CustomNotificationService.streamNotificationsForEmployee(
+          _currentEmployee.id,
+          _currentEmployee.dept,
+        ).listen((notifications) {
+          // 🔔 Hiển thị notification cho thông báo mới
+          if (notifications.isNotEmpty) {
+            final latest = notifications.first;
+            if (kIsWeb) {
+              BrowserNotificationService.show(
+                title: latest.title,
+                body: latest.message,
+              );
+            } else if (Platform.isAndroid) {
+              LocalNotificationService.show(
+                title: latest.title,
+                body: latest.message,
+              );
+            }
+          }
+          _updateBadgeCount();
+        });
 
     // Lắng nghe thay đổi employee (leave status changes) từ Firestore
     _employeeSub = widget.repo.streamEmployees().listen((employees) {

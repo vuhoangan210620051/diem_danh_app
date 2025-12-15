@@ -3,6 +3,7 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import '../../models/employee.dart';
 import '../../repositories/employee_repository.dart';
 import '../../theme/app_colors.dart';
@@ -734,21 +735,27 @@ class _ExportTabState extends State<ExportTab> {
           html.Url.revokeObjectUrl(url);
           _showSnackBar('Xuất file thành công!');
         } else {
-          // Mobile/Desktop: Cho phép user chọn chỗ lưu
+          // Mobile/Desktop: Lưu vào Downloads folder
           try {
-            final outputFile = await FilePicker.platform.saveFile(
-              dialogTitle: 'Chọn nơi lưu file Excel',
-              fileName: fileName,
-              type: FileType.custom,
-              allowedExtensions: ['xlsx'],
-            );
-
-            if (outputFile != null) {
-              final file = File(outputFile);
-              await file.writeAsBytes(bytes);
-              _showSnackBar('Đã lưu file: $fileName');
+            Directory? directory;
+            if (Platform.isAndroid) {
+              // Android: Lưu vào Downloads
+              directory = Directory('/storage/emulated/0/Download');
+              if (!await directory.exists()) {
+                directory = await getExternalStorageDirectory();
+              }
             } else {
-              _showSnackBar('Đã hủy lưu file');
+              // iOS/Desktop: Lưu vào Documents
+              directory = await getApplicationDocumentsDirectory();
+            }
+
+            if (directory != null) {
+              final filePath = '${directory.path}/$fileName';
+              final file = File(filePath);
+              await file.writeAsBytes(bytes);
+              _showSnackBar('Đã lưu file: $filePath');
+            } else {
+              _showSnackBar('Không thể tìm thư mục lưu file');
             }
           } catch (e) {
             _showSnackBar('Lỗi lưu file: $e');
