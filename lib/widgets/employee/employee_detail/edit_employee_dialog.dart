@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import '../../../models/employee.dart';
 import '../../../repositories/employee_repository.dart';
 import '../../../theme/app_colors.dart';
@@ -403,10 +404,32 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
               avatarFile = null;
             });
           } else {
-            setState(() {
-              avatarFile = File(picked.path);
-              avatarBytes = null;
-            });
+            // Crop ảnh trước khi lưu
+            final croppedFile = await ImageCropper().cropImage(
+              sourcePath: picked.path,
+              aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+              uiSettings: [
+                AndroidUiSettings(
+                  toolbarTitle: 'Chỉnh sửa ảnh',
+                  toolbarColor: const Color(0xFF2A3950),
+                  toolbarWidgetColor: Colors.white,
+                  initAspectRatio: CropAspectRatioPreset.square,
+                  lockAspectRatio: true,
+                ),
+                IOSUiSettings(
+                  title: 'Chỉnh sửa ảnh',
+                  aspectRatioLockEnabled: true,
+                  resetAspectRatioEnabled: false,
+                ),
+              ],
+            );
+
+            if (croppedFile != null) {
+              setState(() {
+                avatarFile = File(croppedFile.path);
+                avatarBytes = null;
+              });
+            }
           }
         }
       },

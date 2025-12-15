@@ -133,34 +133,6 @@ class _NotificationTabState extends State<NotificationTab>
 
     // Tạo thông báo từ đơn xin nghỉ
     for (final emp in widget.employees) {
-      // Nhân viên vắng mặt (không check-in trong ngày)
-      final today = DateTime(now.year, now.month, now.day);
-      final hasCheckInToday = emp.checkInHistory.any((record) {
-        final recordDate = DateTime(
-          record.timestamp.year,
-          record.timestamp.month,
-          record.timestamp.day,
-        );
-        return recordDate.isAtSameMomentAs(today);
-      });
-
-      if (!hasCheckInToday && now.hour >= 10) {
-        final notificationId =
-            '\${emp.id}_absent_\${today.millisecondsSinceEpoch}';
-        _notifications.add(
-          NotificationItem(
-            id: notificationId,
-            employeeId: emp.id,
-            employeeName: emp.name,
-            title: 'Nhân viên vắng mặt',
-            message: '${emp.name} không điểm danh hôm nay',
-            timestamp: today,
-            type: NotificationType.absent,
-            isRead: _readNotificationIds.contains(notificationId),
-          ),
-        );
-      }
-
       // Đơn xin nghỉ chờ duyệt (Admin nhận thông báo khi nhân viên tạo đơn)
       for (final leave in emp.leaveHistory) {
         if (leave.status == LeaveStatus.pending) {

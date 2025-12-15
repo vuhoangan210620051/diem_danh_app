@@ -222,25 +222,33 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         return absent.date != today; // Giữ lại absent của các ngày khác
       }).toList();
 
+      // Reset lastCheckInDate để cho phép check-in lại
+      String? newLastCheckInDate;
+
       // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
       if (checkInTime.isAfter(lateLimit)) {
-        // Quá 15p → vắng
+        // Quá 15p → vắng (xóa lastCheckInDate để cho phép check-in lại)
         newAbsentHistory.add(AbsentRecord(date: today));
+        newLastCheckInDate = null;
       } else if (checkInTime.isAfter(startTime)) {
-        // Đi muộn
+        // Đi muộn (giữ lastCheckInDate)
         final minutesLate = checkInTime.difference(startTime).inMinutes;
         if (minutesLate > 0) {
           newLateHistory.add(
             LateRecord(timestamp: checkInTime, minutesLate: minutesLate),
           );
         }
+        newLastCheckInDate = today;
+      } else {
+        // Đúng giờ (giữ lastCheckInDate)
+        newLastCheckInDate = today;
       }
-      // Nếu đúng giờ: không thêm gì cả
 
       // Cập nhật employee
       final updatedEmp = emp.copyWith(
         lateHistory: newLateHistory,
         absentHistory: newAbsentHistory,
+        lastCheckInDate: newLastCheckInDate,
       );
 
       await employeeRepo.updateEmployee(updatedEmp);

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AvatarPicker extends StatefulWidget {
@@ -15,8 +16,8 @@ class AvatarPicker extends StatefulWidget {
 }
 
 class _AvatarPickerState extends State<AvatarPicker> {
-  File? fileImage;           // dùng cho mobile
-  Uint8List? webImageBytes;  // dùng cho web
+  File? fileImage; // dùng cho mobile
+  Uint8List? webImageBytes; // dùng cho web
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
@@ -28,18 +29,39 @@ class _AvatarPickerState extends State<AvatarPicker> {
     if (picked == null) return;
 
     if (kIsWeb) {
-      // ----- WEB: đọc bytes -----
+      // ----- WEB: đọc bytes (web không hỗ trợ crop) -----
       webImageBytes = await picked.readAsBytes();
       fileImage = null;
       widget.onChanged(null, webImageBytes);
+      setState(() {});
     } else {
-      // ----- MOBILE: dùng File -----
-      fileImage = File(picked.path);
-      webImageBytes = null;
-      widget.onChanged(fileImage, null);
-    }
+      // ----- MOBILE: crop trước khi lưu -----
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: picked.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Chỉnh sửa ảnh',
+            toolbarColor: const Color(0xFF2A3950),
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+          ),
+          IOSUiSettings(
+            title: 'Chỉnh sửa ảnh',
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+          ),
+        ],
+      );
 
-    setState(() {});
+      if (croppedFile != null) {
+        fileImage = File(croppedFile.path);
+        webImageBytes = null;
+        widget.onChanged(fileImage, null);
+        setState(() {});
+      }
+    }
   }
 
   @override
