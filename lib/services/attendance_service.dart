@@ -14,17 +14,17 @@ class AttendanceService {
     final today =
         "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
-    // 1. Đã điểm danh
-    if (emp.lastCheckInDate == today) {
+    final startTime = WorkTimeConfig.startTime(now);
+    final lateLimit = WorkTimeConfig.lateLimit(now);
+
+    // 1. Đã điểm danh trong khung giờ hợp lệ
+    if (emp.lastCheckInDate == today && now.isBefore(lateLimit)) {
       return AttendanceResult.alreadyChecked;
     }
 
     if (emp.isOnApprovedLeave(now)) {
       return AttendanceResult.onLeave;
     }
-
-    final startTime = WorkTimeConfig.startTime(now);
-    final lateLimit = WorkTimeConfig.lateLimit(now);
 
     // 3. Quá 15p → vắng
     if (now.isAfter(lateLimit)) {

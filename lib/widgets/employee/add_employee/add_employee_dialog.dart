@@ -286,6 +286,16 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
       return;
     }
 
+    // Kiểm tra email trùng
+    final existingEmployees = await widget.repo.getEmployees();
+    final emailExists = existingEmployees.any(
+      (e) => e.email.toLowerCase() == emailController.text.trim().toLowerCase(),
+    );
+    if (emailExists) {
+      _show("Email đã tồn tại trong hệ thống");
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });

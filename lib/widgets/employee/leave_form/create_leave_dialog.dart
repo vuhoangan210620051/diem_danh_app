@@ -199,8 +199,13 @@ class _CreateLeaveDialogState extends State<_CreateLeaveDialog> {
     Navigator.pop(context);
   }
 
-  String _fmt(DateTime d) =>
-      "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+  String _fmt(DateTime d) {
+    return "${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}";
+  }
+
+  String _displayFmt(DateTime d) {
+    return "${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}";
+  }
 
   Widget _readonlyField(String text) {
     return TextField(enabled: false, decoration: _inputDecoration(hint: text));
@@ -221,7 +226,7 @@ class _CreateLeaveDialogState extends State<_CreateLeaveDialog> {
           child: AbsorbPointer(
             child: TextField(
               decoration: _inputDecoration(
-                hint: date == null ? "mm/dd/yyyy" : _fmt(date),
+                hint: date == null ? "dd/mm/yyyy" : _displayFmt(date),
                 suffix: const Icon(Icons.calendar_month),
               ),
             ),

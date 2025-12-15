@@ -312,7 +312,7 @@ class _ExportTabState extends State<ExportTab> {
                                 const SizedBox(width: 12),
                                 Text(
                                   startDate != null
-                                      ? '${startDate!.day}/${startDate!.month}/${startDate!.year}'
+                                      ? '${startDate!.day.toString().padLeft(2, '0')}/${startDate!.month.toString().padLeft(2, '0')}/${startDate!.year}'
                                       : 'Chọn ngày bắt đầu',
                                   style: TextStyle(
                                     fontSize: 15,
@@ -366,7 +366,7 @@ class _ExportTabState extends State<ExportTab> {
                                 const SizedBox(width: 12),
                                 Text(
                                   endDate != null
-                                      ? '${endDate!.day}/${endDate!.month}/${endDate!.year}'
+                                      ? '${endDate!.day.toString().padLeft(2, '0')}/${endDate!.month.toString().padLeft(2, '0')}/${endDate!.year}'
                                       : 'Chọn ngày kết thúc',
                                   style: TextStyle(
                                     fontSize: 15,
@@ -718,7 +718,7 @@ class _ExportTabState extends State<ExportTab> {
       final bytes = excel.encode();
       if (bytes != null) {
         final fileName =
-            'BaoCaoChamCong_${startDate!.day}-${startDate!.month}-${startDate!.year}_${endDate!.day}-${endDate!.month}-${endDate!.year}.xlsx';
+            'BaoCaoChamCong_${startDate!.day.toString().padLeft(2, '0')}-${startDate!.month.toString().padLeft(2, '0')}-${startDate!.year}_${endDate!.day.toString().padLeft(2, '0')}-${endDate!.month.toString().padLeft(2, '0')}-${endDate!.year}.xlsx';
 
         if (kIsWeb) {
           // Web: Download file

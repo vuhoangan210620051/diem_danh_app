@@ -153,7 +153,7 @@ class _NotificationTabState extends State<NotificationTab>
             employeeId: emp.id,
             employeeName: emp.name,
             title: 'Nhân viên vắng mặt',
-            message: '\${emp.name} không điểm danh hôm nay',
+            message: '${emp.name} không điểm danh hôm nay',
             timestamp: today,
             type: NotificationType.absent,
             isRead: _readNotificationIds.contains(notificationId),
