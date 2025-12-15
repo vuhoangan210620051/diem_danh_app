@@ -204,7 +204,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
       final startTime = WorkTimeConfig.startTime(checkInTime);
       final lateLimit = WorkTimeConfig.lateLimit(checkInTime);
 
-      // Tính lại trạng thái
+      // Xóa tất cả late và absent của hôm nay trước
       List<LateRecord> newLateHistory = emp.lateHistory.where((late) {
         final lateDate = DateTime(
           late.timestamp.year,
@@ -212,13 +212,11 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
           late.timestamp.day,
         );
         final currentDate = DateTime(now.year, now.month, now.day);
-        return !lateDate.isAtSameMomentAs(
-          currentDate,
-        ); // Giữ lại late của các ngày khác
+        return !lateDate.isAtSameMomentAs(currentDate);
       }).toList();
 
       List<AbsentRecord> newAbsentHistory = emp.absentHistory.where((absent) {
-        return absent.date != today; // Giữ lại absent của các ngày khác
+        return absent.date != today;
       }).toList();
 
       // Reset lastCheckInDate để cho phép check-in lại
@@ -227,8 +225,8 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
 
       // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
       if (checkInTime.isAfter(lateLimit)) {
-        // Quá 15p → Reset về trạng thái "chưa điểm danh" (xóa tất cả record của ngày hôm đó)
-        // KHÔNG thêm AbsentRecord - để nhân viên có thể check-in lại
+        // Quá 15p → Reset về trạng thái "chưa điểm danh"
+        // Xóa checkInHistory và KHÔNG thêm late hay absent
         newLastCheckInDate = null;
         newCheckInHistory = emp.checkInHistory.where((record) {
           final recordDate = DateTime(
@@ -240,7 +238,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
           return !recordDate.isAtSameMomentAs(currentDate);
         }).toList();
       } else if (checkInTime.isAfter(startTime)) {
-        // Đi muộn (giữ lastCheckInDate)
+        // Đi muộn - thêm vào newLateHistory (giữ lastCheckInDate và checkInHistory)
         final minutesLate = checkInTime.difference(startTime).inMinutes;
         if (minutesLate > 0) {
           newLateHistory.add(
@@ -249,7 +247,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         }
         newLastCheckInDate = today;
       } else {
-        // Đúng giờ (giữ lastCheckInDate)
+        // Đúng giờ (giữ lastCheckInDate và checkInHistory, không thêm late)
         newLastCheckInDate = today;
       }
 

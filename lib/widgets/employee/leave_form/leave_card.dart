@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../../../models/employee.dart';
 import '../../../models/leave_record.dart';
@@ -21,15 +22,7 @@ class EmployeeLeaveContent extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Avatar
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: const Color(0xFF2A3950),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: const Icon(Icons.person, color: Colors.white, size: 26),
-        ),
+        _buildAvatar(),
 
         const SizedBox(width: 14),
 
@@ -135,6 +128,43 @@ class EmployeeLeaveContent extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildAvatar() {
+    if (employee.avatarPath != null && employee.avatarPath!.isNotEmpty) {
+      if (employee.avatarPath!.startsWith('data:image')) {
+        try {
+          final base64String = employee.avatarPath!.split(',')[1];
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(14),
+            child: Image.memory(
+              const Base64Decoder().convert(base64String),
+              width: 44,
+              height: 44,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return _defaultAvatar();
+              },
+            ),
+          );
+        } catch (e) {
+          return _defaultAvatar();
+        }
+      }
+    }
+    return _defaultAvatar();
+  }
+
+  Widget _defaultAvatar() {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2A3950),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: const Icon(Icons.person, color: Colors.white, size: 26),
     );
   }
 }

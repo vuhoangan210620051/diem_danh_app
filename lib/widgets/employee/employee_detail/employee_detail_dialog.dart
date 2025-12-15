@@ -79,6 +79,17 @@ class EmployeeDetailDialog extends StatelessWidget {
                         count: "${employee.absentCount} lần",
                         items: employee.absentHistory.map((r) {
                           final reason = r.reason ?? "Không rõ lý do";
+                          // Parse date từ yyyy-mm-dd và format thành d/m/y
+                          try {
+                            final parts = r.date.split('-');
+                            if (parts.length == 3) {
+                              final date =
+                                  "${parts[2]}/${parts[1]}/${parts[0]}";
+                              return "$date - $reason";
+                            }
+                          } catch (e) {
+                            // Nếu lỗi thì giữ nguyên
+                          }
                           return "${r.date} - $reason";
                         }).toList(),
                       ),

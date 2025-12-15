@@ -71,7 +71,8 @@ class DetailHeader extends StatelessWidget {
               Expanded(
                 child: _StatBox(
                   label: "Nghỉ phép",
-                  value: "${employee.approvedLeaveCount}",
+                  value:
+                      "${employee.approvedLeaveDaysInYear(DateTime.now().year)} ngày",
                 ),
               ),
               const SizedBox(width: 10),
