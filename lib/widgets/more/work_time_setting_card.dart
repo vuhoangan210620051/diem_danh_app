@@ -5,6 +5,7 @@ import '../../repositories/firebase_work_time_repository.dart';
 import '../../repositories/app_repositories.dart';
 import '../../models/late_record.dart';
 import '../../models/absent_record.dart';
+import '../../models/check_record.dart';
 
 class WorkTimeSettingCard extends StatefulWidget {
   const WorkTimeSettingCard({super.key});
@@ -185,10 +186,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
         "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
 
     for (final emp in employees) {
-      // Chỉ xử lý nhân viên đã check-in hôm nay
-      if (emp.lastCheckInDate != today) continue;
-
-      // Tìm check-in hôm nay
+      // Tìm check-in hôm nay trong checkInHistory (không dùng lastCheckInDate vì có thể bị reset)
       final todayCheckIns = emp.checkInHistory.where((record) {
         final recordDate = DateTime(
           record.timestamp.year,
@@ -196,9 +194,10 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
           record.timestamp.day,
         );
         final currentDate = DateTime(now.year, now.month, now.day);
-        return recordDate.isAtSameMomentAs(currentDate);
+        return recordDate.isAtSameMomentAs(currentDate) && record.type == 'in';
       }).toList();
 
+      // Chỉ xử lý nhân viên đã check-in hôm nay
       if (todayCheckIns.isEmpty) continue;
 
       final checkInTime = todayCheckIns.first.timestamp;
@@ -224,12 +223,22 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
 
       // Reset lastCheckInDate để cho phép check-in lại
       String? newLastCheckInDate;
+      List<CheckRecord> newCheckInHistory = emp.checkInHistory;
 
       // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
       if (checkInTime.isAfter(lateLimit)) {
-        // Quá 15p → vắng (xóa lastCheckInDate để cho phép check-in lại)
+        // Quá 15p → vắng (xóa lastCheckInDate và checkInHistory của ngày hôm đó)
         newAbsentHistory.add(AbsentRecord(date: today));
         newLastCheckInDate = null;
+        newCheckInHistory = emp.checkInHistory.where((record) {
+          final recordDate = DateTime(
+            record.timestamp.year,
+            record.timestamp.month,
+            record.timestamp.day,
+          );
+          final currentDate = DateTime(now.year, now.month, now.day);
+          return !recordDate.isAtSameMomentAs(currentDate);
+        }).toList();
       } else if (checkInTime.isAfter(startTime)) {
         // Đi muộn (giữ lastCheckInDate)
         final minutesLate = checkInTime.difference(startTime).inMinutes;
@@ -246,6 +255,7 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
 
       // Cập nhật employee
       final updatedEmp = emp.copyWith(
+        checkInHistory: newCheckInHistory,
         lateHistory: newLateHistory,
         absentHistory: newAbsentHistory,
         lastCheckInDate: newLastCheckInDate,
