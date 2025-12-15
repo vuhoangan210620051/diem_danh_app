@@ -17,8 +17,19 @@ class AttendanceService {
     final startTime = WorkTimeConfig.startTime(now);
     final lateLimit = WorkTimeConfig.lateLimit(now);
 
-    // 1. Đã điểm danh trong khung giờ hợp lệ
-    if (emp.lastCheckInDate == today && now.isBefore(lateLimit)) {
+    // 1. Kiểm tra đã check-in hôm nay chưa (dựa vào checkInHistory thực tế)
+    final hasCheckedInToday = emp.checkInHistory.any((record) {
+      final recordDate = DateTime(
+        record.timestamp.year,
+        record.timestamp.month,
+        record.timestamp.day,
+      );
+      final currentDate = DateTime(now.year, now.month, now.day);
+      return recordDate.isAtSameMomentAs(currentDate) && record.type == 'in';
+    });
+
+    // Nếu đã check-in và còn trong khung giờ hợp lệ → block
+    if (hasCheckedInToday && now.isBefore(lateLimit)) {
       return AttendanceResult.alreadyChecked;
     }
 

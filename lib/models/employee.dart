@@ -196,22 +196,10 @@ class Employee {
       return isLateToday ? AttendanceStatus.late : AttendanceStatus.present;
     }
 
-    // 4. Chưa đến giờ
-    if (now.isBefore(startTime)) {
-      return AttendanceStatus.notChecked;
-    }
-
-    // 5. Đến giờ nhưng chưa quét
-    if (now.isAfter(startTime) && now.isBefore(lateLimit)) {
-      return AttendanceStatus.notChecked;
-    }
-
-    // 6. Quá 15 phút
-    if (now.isAfter(lateLimit) && now.isBefore(endTime)) {
-      return AttendanceStatus.absent;
-    }
-
-    return AttendanceStatus.absent;
+    // 4. Chưa check-in → hiển thị "chưa điểm danh"
+    // KHÔNG tự động hiển thị absent dựa vào thời gian
+    // Chỉ hiển thị absent nếu có trong absentHistory (đã được xử lý ở bước 2)
+    return AttendanceStatus.notChecked;
   }
 }
 
