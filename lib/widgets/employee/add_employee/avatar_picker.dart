@@ -3,8 +3,9 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:image/image.dart' as img;
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:path_provider/path_provider.dart';
 
 class AvatarPicker extends StatefulWidget {
   final Function(File? file, Uint8List? bytes) onChanged;
@@ -28,40 +29,48 @@ class _AvatarPickerState extends State<AvatarPicker> {
 
     if (picked == null) return;
 
+    final bytes = await picked.readAsBytes();
+
+    // Tự động crop 1:1 (center crop)
+    final croppedBytes = await _cropToSquare(bytes);
+
     if (kIsWeb) {
-      // ----- WEB: đọc bytes (web không hỗ trợ crop) -----
-      webImageBytes = await picked.readAsBytes();
+      webImageBytes = croppedBytes;
       fileImage = null;
       widget.onChanged(null, webImageBytes);
       setState(() {});
     } else {
-      // ----- MOBILE: crop trước khi lưu -----
-      final croppedFile = await ImageCropper().cropImage(
-        sourcePath: picked.path,
-        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-        uiSettings: [
-          AndroidUiSettings(
-            toolbarTitle: 'Chỉnh sửa ảnh',
-            toolbarColor: const Color(0xFF2A3950),
-            toolbarWidgetColor: Colors.white,
-            initAspectRatio: CropAspectRatioPreset.square,
-            lockAspectRatio: true,
-          ),
-          IOSUiSettings(
-            title: 'Chỉnh sửa ảnh',
-            aspectRatioLockEnabled: true,
-            resetAspectRatioEnabled: false,
-          ),
-        ],
+      // Mobile: lưu vào file tạm
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File(
+        '${tempDir.path}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
       );
+      await tempFile.writeAsBytes(croppedBytes);
 
-      if (croppedFile != null) {
-        fileImage = File(croppedFile.path);
-        webImageBytes = null;
-        widget.onChanged(fileImage, null);
-        setState(() {});
-      }
+      fileImage = tempFile;
+      webImageBytes = null;
+      widget.onChanged(fileImage, null);
+      setState(() {});
     }
+  }
+
+  Future<Uint8List> _cropToSquare(Uint8List bytes) async {
+    final image = img.decodeImage(bytes);
+    if (image == null) return bytes;
+
+    final size = image.width < image.height ? image.width : image.height;
+    final offsetX = (image.width - size) ~/ 2;
+    final offsetY = (image.height - size) ~/ 2;
+
+    final cropped = img.copyCrop(
+      image,
+      x: offsetX,
+      y: offsetY,
+      width: size,
+      height: size,
+    );
+
+    return Uint8List.fromList(img.encodeJpg(cropped, quality: 85));
   }
 
   @override

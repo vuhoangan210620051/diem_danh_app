@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
 import '../../../models/employee.dart';
 import '../../../repositories/employee_repository.dart';
 import '../../../theme/app_colors.dart';
@@ -431,39 +432,28 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
         );
 
         if (picked != null) {
+          final bytes = await picked.readAsBytes();
+
+          // Tự động crop 1:1 (center crop)
+          final croppedBytes = await _cropToSquare(bytes);
+
           if (kIsWeb) {
-            final bytes = await picked.readAsBytes();
             setState(() {
-              avatarBytes = bytes;
+              avatarBytes = croppedBytes;
               avatarFile = null;
             });
           } else {
-            // Crop ảnh trước khi lưu
-            final croppedFile = await ImageCropper().cropImage(
-              sourcePath: picked.path,
-              aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
-              uiSettings: [
-                AndroidUiSettings(
-                  toolbarTitle: 'Chỉnh sửa ảnh',
-                  toolbarColor: const Color(0xFF2A3950),
-                  toolbarWidgetColor: Colors.white,
-                  initAspectRatio: CropAspectRatioPreset.square,
-                  lockAspectRatio: true,
-                ),
-                IOSUiSettings(
-                  title: 'Chỉnh sửa ảnh',
-                  aspectRatioLockEnabled: true,
-                  resetAspectRatioEnabled: false,
-                ),
-              ],
+            // Mobile: lưu vào file tạm
+            final tempDir = await getTemporaryDirectory();
+            final tempFile = File(
+              '${tempDir.path}/avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
             );
+            await tempFile.writeAsBytes(croppedBytes);
 
-            if (croppedFile != null) {
-              setState(() {
-                avatarFile = File(croppedFile.path);
-                avatarBytes = null;
-              });
-            }
+            setState(() {
+              avatarFile = tempFile;
+              avatarBytes = null;
+            });
           }
         }
       },
@@ -502,5 +492,24 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
       ),
       child: const Icon(Icons.add_a_photo, size: 32, color: Colors.grey),
     );
+  }
+
+  Future<Uint8List> _cropToSquare(Uint8List bytes) async {
+    final image = img.decodeImage(bytes);
+    if (image == null) return bytes;
+
+    final size = image.width < image.height ? image.width : image.height;
+    final offsetX = (image.width - size) ~/ 2;
+    final offsetY = (image.height - size) ~/ 2;
+
+    final cropped = img.copyCrop(
+      image,
+      x: offsetX,
+      y: offsetY,
+      width: size,
+      height: size,
+    );
+
+    return Uint8List.fromList(img.encodeJpg(cropped, quality: 85));
   }
 }
