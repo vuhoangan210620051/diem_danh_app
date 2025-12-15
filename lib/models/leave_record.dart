@@ -94,4 +94,21 @@ class LeaveRecord {
     "status": status.name,
     "days": days,
   };
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is LeaveRecord &&
+        other.type == type &&
+        other.startDate == startDate &&
+        other.endDate == endDate &&
+        other.reason == reason &&
+        other.status == status &&
+        other.days == days;
+  }
+
+  @override
+  int get hashCode {
+    return Object.hash(type, startDate, endDate, reason, status, days);
+  }
 }
