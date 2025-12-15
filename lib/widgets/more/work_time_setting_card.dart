@@ -227,8 +227,8 @@ class _WorkTimeSettingCardState extends State<WorkTimeSettingCard> {
 
       // Kiểm tra lại: đi muộn hay đúng giờ hay vắng
       if (checkInTime.isAfter(lateLimit)) {
-        // Quá 15p → vắng (xóa lastCheckInDate và checkInHistory của ngày hôm đó)
-        newAbsentHistory.add(AbsentRecord(date: today));
+        // Quá 15p → Reset về trạng thái "chưa điểm danh" (xóa tất cả record của ngày hôm đó)
+        // KHÔNG thêm AbsentRecord - để nhân viên có thể check-in lại
         newLastCheckInDate = null;
         newCheckInHistory = emp.checkInHistory.where((record) {
           final recordDate = DateTime(

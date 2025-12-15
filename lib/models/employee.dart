@@ -14,6 +14,7 @@ class Employee {
   final String email;
   final String password;
   final String? avatarPath;
+  final String? gender; // "Nam", "Nữ", "Khác"
   final String? lastCheckInDate;
   final List<LateRecord> lateHistory;
   final List<AbsentRecord> absentHistory;
@@ -28,6 +29,7 @@ class Employee {
     required this.email,
     required this.password,
     this.avatarPath,
+    this.gender,
     this.lateHistory = const [],
     this.leaveHistory = const [],
     this.absentHistory = const [],
@@ -42,6 +44,7 @@ class Employee {
     String? email,
     String? password,
     String? avatarPath,
+    String? gender,
     List<LateRecord>? lateHistory,
     List<LeaveRecord>? leaveHistory,
     List<AbsentRecord>? absentHistory,
@@ -56,6 +59,7 @@ class Employee {
       email: email ?? this.email,
       password: password ?? this.password,
       avatarPath: avatarPath ?? this.avatarPath,
+      gender: gender ?? this.gender,
       lateHistory: lateHistory ?? this.lateHistory,
       leaveHistory: leaveHistory ?? this.leaveHistory,
       absentHistory: absentHistory ?? this.absentHistory,
@@ -77,6 +81,7 @@ class Employee {
     "checkInHistory": checkInHistory.map((e) => e.toJson()).toList(),
     "checkOutHistory": checkOutHistory.map((e) => e.toJson()).toList(),
     "avatarPath": avatarPath,
+    "gender": gender,
     "lateHistory": lateHistory.map((e) => e.toJson()).toList(),
     "absentHistory": absentHistory.map((e) => e.toJson()).toList(),
     "leaveHistory": leaveHistory.map((e) => e.toJson()).toList(),
@@ -103,6 +108,7 @@ class Employee {
       email: json["email"],
       password: json["password"],
       avatarPath: json["avatarPath"],
+      gender: json["gender"],
       lateHistory: (json["lateHistory"] as List<dynamic>? ?? [])
           .map((e) => LateRecord.fromJson(e))
           .toList(),

@@ -67,6 +67,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
 
   final nameController = TextEditingController();
   String? selectedDept;
+  String? selectedGender;
   bool isLoading = false;
 
   @override
@@ -213,6 +214,32 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                   hint: const Text("Chọn phòng ban"),
                 ),
 
+                const SizedBox(height: 18),
+
+                // -------- Giới tính --------
+                const Text(
+                  "Giới tính",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<String>(
+                  items: const [
+                    DropdownMenuItem(value: "Nam", child: Text("Nam")),
+                    DropdownMenuItem(value: "Nữ", child: Text("Nữ")),
+                    DropdownMenuItem(value: "Khác", child: Text("Khác")),
+                  ],
+                  onChanged: (v) => selectedGender = v,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7F8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  hint: const Text("Chọn giới tính"),
+                ),
+
                 const SizedBox(height: 32),
 
                 // -------- BUTTONS --------
@@ -319,6 +346,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
         avatarPath: avatarBase64,
+        gender: selectedGender,
       );
 
       await widget.repo.addEmployee(employee);

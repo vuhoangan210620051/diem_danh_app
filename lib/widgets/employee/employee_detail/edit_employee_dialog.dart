@@ -40,6 +40,7 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late String selectedDept;
+  late String? selectedGender;
   bool _obscurePassword = true;
   File? avatarFile;
   Uint8List? avatarBytes;
@@ -52,6 +53,7 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
     emailController = TextEditingController(text: widget.employee.email);
     passwordController = TextEditingController(text: widget.employee.password);
     selectedDept = widget.employee.dept;
+    selectedGender = widget.employee.gender;
     currentAvatarPath = widget.employee.avatarPath;
   }
 
@@ -239,6 +241,37 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
                   ),
                 ),
 
+                const SizedBox(height: 18),
+
+                // -------- Giới tính --------
+                const Text(
+                  "Giới tính",
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                DropdownButtonFormField<String>(
+                  initialValue: selectedGender,
+                  items: const [
+                    DropdownMenuItem(value: "Nam", child: Text("Nam")),
+                    DropdownMenuItem(value: "Nữ", child: Text("Nữ")),
+                    DropdownMenuItem(value: "Khác", child: Text("Khác")),
+                  ],
+                  onChanged: (v) {
+                    setState(() {
+                      selectedGender = v;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color(0xFFF5F7F8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                  hint: const Text("Chọn giới tính"),
+                ),
+
                 const SizedBox(height: 32),
 
                 // -------- BUTTONS --------
@@ -305,6 +338,7 @@ class _EditEmployeeDialogState extends State<EditEmployeeDialog> {
       email: emailController.text.trim(),
       password: passwordController.text.trim(),
       dept: selectedDept,
+      gender: selectedGender,
       avatarPath: avatarBase64,
     );
 

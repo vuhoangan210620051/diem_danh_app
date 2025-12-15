@@ -45,7 +45,7 @@ class DetailHeader extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      "${employee.id} • ${employee.dept}",
+                      "${employee.id} • ${employee.dept}${employee.gender != null ? ' • ${employee.gender}' : ''}",
                       style: TextStyle(fontSize: 14, color: Colors.white70),
                     ),
                   ],
